@@ -8,12 +8,14 @@ import (
 
 // Player ...
 type Player struct {
-	c chan int
+	c    chan int
+	wait chan struct{}
 }
 
 // NewPlayer ...
 func NewPlayer() *Player {
 	c := make(chan int, 0)
+	wait := make(chan struct{}, 0)
 	go func() {
 		for {
 			fmt.Print("Enter move: ")
@@ -28,10 +30,12 @@ func NewPlayer() *Player {
 				continue
 			}
 			c <- move
+			<-wait
 		}
 	}()
 	return &Player{
-		c: c,
+		c:    c,
+		wait: wait,
 	}
 }
 
@@ -43,6 +47,16 @@ func (p *Player) Read() ([]float32, error) {
 }
 
 func (p *Player) Write(v []float32) error {
-	log.Println(v)
+	// Get the max probability
+	max := float32(0)
+	idx := -1
+	for i, v := range v {
+		if v > max {
+			max = v
+			idx = i
+		}
+	}
+	fmt.Println("My move:", idx)
+	p.wait <- struct{}{}
 	return nil
 }
