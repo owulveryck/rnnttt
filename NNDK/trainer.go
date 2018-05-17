@@ -1,7 +1,8 @@
-package nndk
+package main
 
 import (
 	G "github.com/chewxy/gorgonia"
+	"github.com/owulveryck/lstm/datasetter"
 )
 
 type tictactoe struct{}
@@ -19,6 +20,6 @@ func (ttt *tictactoe) GetExpectedValue(offset int) (int, error) {
 	return 0, nil
 }
 
-func (ttt *tictactoe) GetTrainer() (*tictactoe, error) {
-	return ttt, nil
+func (ttt *tictactoe) GetTrainer() (datasetter.Trainer, error) {
+	return nil, nil
 }
