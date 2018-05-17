@@ -1,4 +1,4 @@
-package nnre
+package main
 
 // Player ...
 type Player struct{}
