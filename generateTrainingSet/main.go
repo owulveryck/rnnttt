@@ -11,18 +11,30 @@ import (
 type tttBoard [9]int
 
 func main() {
-	var board tttBoard
-	for i := 0; i < 19683; i++ {
-		c := i
-		for j := 0; j < 9; j++ {
-			board[j] = c % 3
-			c = c / 3
-		}
-		if isValid(board) && isWinning(2, board) && !isWinning(1, board) {
-			//			fmt.Println(board)
-			generateMoves(2, board)
-		}
+	c := gen()
+	for v := range c {
+		fmt.Println(v)
 	}
+}
+
+func gen() chan []int {
+	c := make(chan []int, 0)
+	go func() {
+		var board tttBoard
+		for i := 0; i < 19683; i++ {
+			m := i
+			for j := 0; j < 9; j++ {
+				board[j] = m % 3
+				m = m / 3
+			}
+			if isValid(board) && isWinning(2, board) && !isWinning(1, board) {
+				//			fmt.Println(board)
+				generateMoves(2, board, c)
+			}
+		}
+		close(c)
+	}()
+	return c
 }
 
 func isValid(board tttBoard) bool {
@@ -58,7 +70,7 @@ func isWinning(value int, board tttBoard) bool {
 }
 
 // games is the an array of the number of games and board
-func generateMoves(token int, board tttBoard) {
+func generateMoves(token int, board tttBoard, c chan []int) {
 	// Generate a graph for the board
 	g := simple.NewDirectedGraph(0, 0)
 	// First loop to create all the node (to avoid orphan nodes)
@@ -99,7 +111,12 @@ func generateMoves(token int, board tttBoard) {
 					paths, _ := allPaths.AllBetween(simple.Node(i), simple.Node(j))
 					for _, path := range paths {
 						if len(path) == moves {
-							fmt.Println(path)
+							out := make([]int, len(path))
+							for i, n := range path {
+								out[i] = n.ID()
+							}
+							//fmt.Println(out)
+							c <- out
 						}
 
 					}
