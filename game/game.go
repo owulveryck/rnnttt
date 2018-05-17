@@ -1,7 +1,6 @@
-package main
+package game
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gonum/graph/path"
@@ -10,14 +9,8 @@ import (
 
 type tttBoard [9]int
 
-func main() {
-	c := gen()
-	for v := range c {
-		fmt.Println(v)
-	}
-}
-
-func gen() chan []int {
+// Generate all the positions
+func Generate() chan []int {
 	c := make(chan []int, 0)
 	go func() {
 		var board tttBoard
@@ -115,7 +108,6 @@ func generateMoves(token int, board tttBoard, c chan []int) {
 							for i, n := range path {
 								out[i] = n.ID()
 							}
-							//fmt.Println(out)
 							c <- out
 						}
 
@@ -125,34 +117,4 @@ func generateMoves(token int, board tttBoard, c chan []int) {
 		}
 	}
 
-}
-
-func isEqual(a []int, b tttBoard) bool {
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func isNull(board tttBoard) bool {
-	var total int
-	for i := range board {
-		total += board[i]
-	}
-	if total == 0 {
-		return true
-	}
-	return false
-}
-
-func getNumberOf(token int, board tttBoard) int {
-	var ret int
-	for i := range board {
-		if board[i] == token {
-			ret++
-		}
-	}
-	return ret
 }
