@@ -1,25 +1,38 @@
 package main
 
 import (
-	G "github.com/chewxy/gorgonia"
+	"fmt"
+
 	"github.com/owulveryck/lstm/datasetter"
+	G "gorgonia.org/gorgonia"
+	"gorgonia.org/tensor"
 )
 
-type tictactoe struct{}
+type game struct {
+	currentBoard  []int
+	computerMoves G.Nodes
+	offset        int
+}
 
-func (ttt *tictactoe) ReadInputVector(G *G.ExprGraph) (*G.Node, error) {
-	return nil, nil
+func (gme *game) ReadInputVector(g *G.ExprGraph) (*G.Node, error) {
+	oneHotMove := make([]int, 9)
+	inputTensor := tensor.New(tensor.WithShape(9), tensor.WithBacking(oneHotMove))
+	node := G.NewVector(g, tensor.Float32, G.WithName(fmt.Sprintf("input_%v", gme.offset)), G.WithShape(9), G.WithValue(inputTensor))
+	return node, nil
 }
-func (ttt *tictactoe) WriteComputedVector(n *G.Node) error {
+func (gme *game) WriteComputedVector(n *G.Node) error {
+	gme.computerMoves = append(gme.computerMoves, n)
 	return nil
 }
-func (ttt *tictactoe) GetComputedVectors() G.Nodes {
-	return nil
+func (gme *game) GetComputedVectors() G.Nodes {
+	return gme.computerMoves
 }
-func (ttt *tictactoe) GetExpectedValue(offset int) (int, error) {
+func (gme *game) GetExpectedValue(offset int) (int, error) {
 	return 0, nil
 }
 
+type tictactoe struct{}
+
 func (ttt *tictactoe) GetTrainer() (datasetter.Trainer, error) {
-	return nil, nil
+	return &game{}, nil
 }
