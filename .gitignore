@@ -14,3 +14,4 @@ generateTrainingSet/generateTrainingSet
 nnre/nnre
 nndk/nndk
 */*.bin
+*/*.swp
