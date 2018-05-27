@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -10,14 +11,15 @@ import (
 type Player struct {
 	board  []int
 	c      chan int
-	wait   chan struct{}
+	wait   chan int
 	offset int
+	play   bool
 }
 
 // NewPlayer ...
 func NewPlayer() *Player {
 	c := make(chan int, 0)
-	wait := make(chan struct{}, 0)
+	wait := make(chan int, 0)
 	p := &Player{
 		c:     c,
 		wait:  wait,
@@ -26,6 +28,7 @@ func NewPlayer() *Player {
 
 	go func() {
 		for {
+			p.play = true
 			fmt.Print("Enter move: ")
 			var input string
 			fmt.Scanln(&input)
@@ -42,7 +45,8 @@ func NewPlayer() *Player {
 			}
 			p.offset++
 			c <- move
-			<-wait
+			p.play = false
+			c <- <-wait
 		}
 	}()
 	return p
@@ -57,6 +61,9 @@ func (p *Player) Read() ([]float32, error) {
 }
 
 func (p *Player) Write(v []float32) error {
+	if p.play {
+		return nil
+	}
 	// Get the max probability
 	max := float32(0)
 	idx := -1
@@ -66,8 +73,11 @@ func (p *Player) Write(v []float32) error {
 			idx = i
 		}
 	}
+	if idx == -1 {
+		return errors.New("game end")
+	}
 	fmt.Println("My move:", idx)
 	p.board[idx] = 1
-	p.wait <- struct{}{}
+	p.wait <- idx
 	return nil
 }

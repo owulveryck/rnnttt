@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	model := lstm.NewModel(9, 9, 100)
+	model := lstm.NewModel(9, 9, 500)
 	learnrate := 1e-3
-	l2reg := 1e-6
+	l2reg := 1e-3
 	clipVal := float64(5)
 	solver := G.NewRMSPropSolver(G.WithLearnRate(learnrate), G.WithL2Reg(l2reg), G.WithClip(clipVal))
 
