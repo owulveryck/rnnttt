@@ -9,11 +9,12 @@ import (
 
 // Player ...
 type Player struct {
-	board  []int
-	c      chan int
-	wait   chan int
-	offset int
-	play   bool
+	board       []int
+	visualBoard board
+	c           chan int
+	wait        chan int
+	offset      int
+	play        bool
 }
 
 // NewPlayer ...
@@ -25,8 +26,12 @@ func NewPlayer() *Player {
 		wait:  wait,
 		board: make([]int, 18),
 	}
+	p.visualBoard.draw()
 
 	go func() {
+		c <- 9
+		p.play = false
+		c <- <-wait
 		for {
 			p.play = true
 			fmt.Print("Enter move: ")
@@ -46,6 +51,7 @@ func NewPlayer() *Player {
 				}
 				p.board[move] = 1
 			}
+			p.visualBoard[move] = "O"
 			c <- move
 			p.play = false
 			c <- <-wait
@@ -81,6 +87,8 @@ func (p *Player) Write(v []float32) error {
 		return errors.New("game end")
 	}
 	fmt.Println("My move:", idx)
+	p.visualBoard[idx] = "X"
+	p.visualBoard.draw()
 	p.board[idx+9] = 1
 	p.wait <- idx
 	return nil
