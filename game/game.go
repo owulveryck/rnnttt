@@ -29,7 +29,7 @@ func Generate() chan []int {
 					board[j] = m % 2
 					m = m / 2
 				}
-				if isValid(board) && !isWinning(tokenX, board) {
+				if isValid(board) && !isWinning(tokenO, board) {
 					generateMoves(tokenX, board, c)
 				}
 			}
@@ -115,7 +115,7 @@ func generateMoves(token int, board tttBoard, c chan []int) {
 							for i, n := range path {
 								out[i] = n.ID()
 							}
-							if out[0] == 0 && out[1] == 4 {
+							if out[0] == 4 && (out[2] == 0 || out[2] == 1 || out[2] == 3) {
 								c <- out
 							}
 						}

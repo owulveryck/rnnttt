@@ -23,7 +23,7 @@ func NewPlayer() *Player {
 	p := &Player{
 		c:     c,
 		wait:  wait,
-		board: make([]int, 9),
+		board: make([]int, 18),
 	}
 
 	go func() {
@@ -37,13 +37,15 @@ func NewPlayer() *Player {
 				log.Println(err)
 				continue
 			}
-			if move > 8 {
+			if move > 9 {
 				continue
 			}
-			if p.board[move] == 1 {
-				continue
+			if move != 9 {
+				if p.board[move] == 1 || p.board[move+9] == 1 {
+					continue
+				}
+				p.board[move] = 1
 			}
-			p.offset++
 			c <- move
 			p.play = false
 			c <- <-wait
@@ -53,10 +55,12 @@ func NewPlayer() *Player {
 }
 
 func (p *Player) Read() ([]float32, error) {
-	move := <-p.c
-	p.board[move] = 1
-	output := make([]float32, 9)
-	output[move] = 1
+	<-p.c
+	output := make([]float32, 18)
+	for i := range p.board {
+		output[i] = float32(p.board[i])
+	}
+	p.offset++
 	return output, nil
 }
 
@@ -68,7 +72,7 @@ func (p *Player) Write(v []float32) error {
 	max := float32(0)
 	idx := -1
 	for i, v := range v {
-		if v > max && p.board[i] == 0 {
+		if v > max && p.board[i] == 0 && p.board[i+9] == 0 {
 			max = v
 			idx = i
 		}
@@ -77,7 +81,7 @@ func (p *Player) Write(v []float32) error {
 		return errors.New("game end")
 	}
 	fmt.Println("My move:", idx)
-	p.board[idx] = 1
+	p.board[idx+9] = 1
 	p.wait <- idx
 	return nil
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	model := lstm.NewModel(9, 9, 500)
+	model := lstm.NewModel(18, 9, 512)
 	learnrate := 1e-3
 	l2reg := 1e-3
 	clipVal := float64(5)
