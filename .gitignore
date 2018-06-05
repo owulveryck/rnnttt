@@ -15,3 +15,5 @@ nnre/nnre
 nndk/nndk
 */*.bin
 */*.swp
+nnre/*.bin 
+nnre/wasm/test.wasm
