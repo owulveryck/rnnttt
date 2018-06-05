@@ -3,66 +3,20 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
-	"strconv"
 )
 
 // Player ...
 type Player struct {
-	board       []int
-	visualBoard board
-	c           chan int
-	wait        chan int
-	offset      int
-	play        bool
-}
-
-// NewPlayer ...
-func NewPlayer() *Player {
-	c := make(chan int, 0)
-	wait := make(chan int, 0)
-	p := &Player{
-		c:     c,
-		wait:  wait,
-		board: make([]int, 18),
-	}
-	p.visualBoard.draw()
-
-	go func() {
-		c <- 9
-		p.play = false
-		c <- <-wait
-		for {
-			p.play = true
-			var err error
-			fmt.Print("Enter move: ")
-			var input string
-			fmt.Scanln(&input)
-			move, err := strconv.Atoi(input)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			if move > 9 {
-				continue
-			}
-			if move != 9 {
-				if p.board[move] == 1 || p.board[move+9] == 1 {
-					continue
-				}
-				p.board[move] = 1
-			}
-			p.visualBoard[move] = "O"
-			c <- move
-			p.play = false
-			c <- <-wait
-		}
-	}()
-	return p
+	board         []int
+	visualBoard   board
+	inputMove     chan int
+	predictedMove chan int
+	offset        int
+	play          bool
 }
 
 func (p *Player) Read() ([]float32, error) {
-	<-p.c
+	<-p.inputMove
 	output := make([]float32, 18)
 	for i := range p.board {
 		output[i] = float32(p.board[i])
@@ -91,6 +45,6 @@ func (p *Player) Write(v []float32) error {
 	p.visualBoard[idx] = "X"
 	p.visualBoard.draw()
 	p.board[idx+9] = 1
-	p.wait <- idx
+	p.predictedMove <- idx
 	return nil
 }

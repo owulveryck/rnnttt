@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/owulveryck/lstm"
 )
@@ -20,10 +20,11 @@ func main() {
 			log.Fatal("Cannot restore software 2.0", err)
 		}
 	*/
+	fmt.Println("hello")
 	model := lstm.NewModel(9, 9, 100)
 	p := NewPlayer()
 	err := model.Predict(context.TODO(), p)
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 }
