@@ -15,15 +15,16 @@ func NewPlayer() *Player {
 		inputMove:     inputMove,
 		predictedMove: predictedMove,
 		board:         make([]int, 18),
+		hasPlayed:     make(chan string, 0),
 	}
 	p.visualBoard.draw()
 
 	go func() {
 		inputMove <- 9
-		p.play = false
+		p.hasPlayed <- "O"
 		inputMove <- <-predictedMove
+		p.hasPlayed <- "X"
 		for {
-			p.play = true
 			var err error
 			fmt.Print("Enter move: ")
 			var input string
@@ -44,8 +45,9 @@ func NewPlayer() *Player {
 			}
 			p.visualBoard[move] = "O"
 			inputMove <- move
-			p.play = false
+			p.hasPlayed <- "O"
 			inputMove <- <-predictedMove
+			p.hasPlayed <- "X"
 		}
 	}()
 	return p

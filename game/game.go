@@ -115,7 +115,7 @@ func generateMoves(token int, board tttBoard, c chan []int) {
 							for i, n := range path {
 								out[i] = n.ID()
 							}
-							if out[0] == 4 && (out[2] == 0 || out[2] == 1 || out[2] == 3) {
+							if out[0] == 4 {
 								c <- out
 							}
 						}

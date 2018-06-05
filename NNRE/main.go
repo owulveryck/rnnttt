@@ -20,7 +20,7 @@ func main() {
 			log.Fatal("Cannot restore software 2.0", err)
 		}
 	*/
-	fmt.Println("hello")
+	fmt.Println("Let's play a game")
 	model := lstm.NewModel(9, 9, 100)
 	p := NewPlayer()
 	err := model.Predict(context.TODO(), p)

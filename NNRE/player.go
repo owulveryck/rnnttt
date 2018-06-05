@@ -12,7 +12,7 @@ type Player struct {
 	inputMove     chan int
 	predictedMove chan int
 	offset        int
-	play          bool
+	hasPlayed     chan string
 }
 
 func (p *Player) Read() ([]float32, error) {
@@ -26,7 +26,8 @@ func (p *Player) Read() ([]float32, error) {
 }
 
 func (p *Player) Write(v []float32) error {
-	if p.play {
+	hasPlayed := <-p.hasPlayed
+	if hasPlayed == "X" {
 		return nil
 	}
 	// Get the max probability
