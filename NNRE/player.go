@@ -34,6 +34,7 @@ func NewPlayer() *Player {
 		c <- <-wait
 		for {
 			p.play = true
+			var err error
 			fmt.Print("Enter move: ")
 			var input string
 			fmt.Scanln(&input)
