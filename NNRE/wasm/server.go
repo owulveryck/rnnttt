@@ -1,15 +1,23 @@
 package main
 
 import (
-	"flag"
-	"log"
 	"net/http"
+
+	"github.com/urfave/negroni"
 )
 
+func wasmHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/wasm")
+	http.ServeFile(w, r, "test.wasm")
+}
 func main() {
-	addr := flag.String("addr", ":5555", "server address:port")
-	flag.Parse()
-	srv := http.FileServer(http.Dir("."))
-	log.Printf("listening on %q...", *addr)
-	log.Fatal(http.ListenAndServe(*addr, srv))
+	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir(".")))
+	mux.HandleFunc("/test.wasm", wasmHandler)
+
+	n := negroni.Classic() // Includes some default middlewares
+	n.UseHandler(mux)
+
+	http.ListenAndServe(":3000", n)
+
 }
