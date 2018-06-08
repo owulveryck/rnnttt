@@ -23,7 +23,9 @@ func NewPlayer() *Player {
 		fmt.Println("Let's play")
 		inputMove <- 9
 		p.hasPlayed <- "O"
-		inputMove <- <-predictedMove
+		myMove := <-predictedMove
+		js.Global.Set("output", js.ValueOf(myMove))
+		inputMove <- myMove
 		p.hasPlayed <- "X"
 	}()
 	var cb js.Callback
@@ -46,7 +48,6 @@ func NewPlayer() *Player {
 		p.hasPlayed <- "O"
 		myMove := <-predictedMove
 		js.Global.Set("output", js.ValueOf(myMove))
-
 		inputMove <- myMove
 		p.hasPlayed <- "X"
 	})
