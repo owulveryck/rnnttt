@@ -29,16 +29,13 @@ func NewPlayer() *Player {
 	var cb js.Callback
 	cb = js.NewCallback(func(args []js.Value) {
 		fmt.Println("Callback")
-		move := js.Global.Get("document").Call("getElementById", "myMove").Get("value").Int()
+		move := args[0].Int()
 		fmt.Println(move)
-		js.Global.Get("document").Call("getElementById", "myMove").Set("value", "")
 		if move > 9 {
-			js.Global.Get("document").Call("getElementById", "myMove").Set("value", "Invalid")
 			return
 		}
 		if move != 9 {
 			if p.board[move] == 1 || p.board[move+9] == 1 {
-				js.Global.Get("document").Call("getElementById", "myMove").Set("value", "Invalid")
 				return
 			}
 			p.board[move] = 1
@@ -47,10 +44,13 @@ func NewPlayer() *Player {
 		p.visualBoard[move] = "O"
 		inputMove <- move
 		p.hasPlayed <- "O"
-		inputMove <- <-predictedMove
+		myMove := <-predictedMove
+		js.Global.Set("output", js.ValueOf(myMove))
+
+		inputMove <- myMove
 		p.hasPlayed <- "X"
 	})
-	js.Global.Get("document").Call("getElementById", "myMove").Call("addEventListener", "input", cb)
+	js.Global.Set("play", cb)
 
 	return p
 }
