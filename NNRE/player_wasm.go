@@ -57,6 +57,7 @@ func NewPlayer() *Player {
 			i,
 			p,
 		}
+		js.Global.Get("document").Call("getElementById", v).Set("innerHTML", js.ValueOf("."))
 		js.Global.Get("document").Call("getElementById", v).Call("addEventListener", "click", js.NewCallback(m.cb))
 
 	}
