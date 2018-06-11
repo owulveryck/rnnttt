@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 )
 
 // Player ...
@@ -16,7 +17,10 @@ type Player struct {
 }
 
 func (p *Player) Read() ([]float32, error) {
-	<-p.inputMove
+	mve := <-p.inputMove
+	if mve == 10 {
+		return nil, io.EOF
+	}
 	output := make([]float32, 18)
 	for i := range p.board {
 		output[i] = float32(p.board[i])

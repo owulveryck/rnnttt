@@ -20,7 +20,6 @@ func NewPlayer() *Player {
 	}
 
 	go func() {
-		fmt.Println("Let's play")
 		inputMove <- 9
 		p.hasPlayed <- "O"
 		myMove := <-predictedMove
@@ -30,9 +29,11 @@ func NewPlayer() *Player {
 	}()
 	var cb js.Callback
 	cb = js.NewCallback(func(args []js.Value) {
-		fmt.Println("Callback")
 		move := args[0].Int()
 		fmt.Println(move)
+		if move == 10 {
+			inputMove <- move
+		}
 		if move > 9 {
 			return
 		}
